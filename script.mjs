@@ -1,5 +1,5 @@
 const canvas = document.querySelector("canvas");
-const GRID_SIZE = 5000;
+const GRID_SIZE = 500;
 
 if (!navigator.gpu) {
 	// browser doenst support webgpu
@@ -79,22 +79,37 @@ const cellShaderModule = device.createShaderModule({
 	label: "cell shader",
 	code: `
         // shader code goes here:
+        
+        struct VertexInput {
+            @location(0) pos: vec2f,
+            @builtin(instance_index) instance: u32,
+        };
+
+        struct VertexOutput {
+            @builtin(position) pos: vec4f,
+            @location(0) cell: vec2f,
+        };
+
         @group(0) @binding(0) var<uniform> grid: vec2f;
 
         @vertex
-        fn vertexMain(
-            @location(0) pos: vec2f,
-            @builtin(instance_index) instance: u32) ->
-        @builtin(position) vec4f {
-            let i = f32(instance);
-            var gridPos: vec2f = (pos + 1) / grid - 1; // places in lower left
-            gridPos += vec2f(floor(i / grid.x), i % grid.x) / (grid / 2);
-            return vec4f(gridPos, 0,1);
+        fn vertexMain(input: VertexInput) -> VertexOutput {
+            let i = f32(input.instance);
+            var gridPos: vec2f = (input.pos + .8) / grid; // places in lower left
+            gridPos *= 1.25;
+            gridPos -= 1;
+            let cell: vec2f = vec2f(floor(i / grid.x), i % grid.x);
+            gridPos += cell / (grid / 2);
+
+            var output: VertexOutput;
+            output.pos = vec4f(gridPos, 0, 1);
+            output.cell = cell;
+            return output;
         }
 
         @fragment
-        fn fragmentMain() -> @location(0) vec4f {
-            return vec4f(1,1,0,1);
+        fn fragmentMain(@location(0) cell: vec2f) -> @location(0) vec4f {
+            return vec4f(cell/grid,0,1);
         }
     `,
 });
