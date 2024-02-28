@@ -7,47 +7,6 @@
 	</head>
 	<body>
 		<canvas width="1024" height="1024"></canvas>
-		<script type="module">
-			const canvas = document.querySelector("canvas");
-
-			if (!navigator.gpu) {
-				// browser doenst support webgpu
-				alert("WebGPU is not supported on this browser.");
-				throw new Error("WebGPU is not supported on this browser.");
-			}
-
-			const adapter = await navigator.gpu.requestAdapter(); // can pass arugments to get a high/low power gpu
-			if (!adapter) {
-				// hardware doesnt support webgpu
-				throw new Error("No GPUAdapter found.");
-			}
-			const device = await adapter.requestDevice(); // can pass arguments
-			const context = canvas.getContext("webgpu");
-			const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-			context.configure({
-				device: device,
-				format: canvasFormat, // texture format the canvas will use
-			});
-			// textures are objects that webgpu useds to store image data, texture formats will the gpu how the data is layed out
-			// can have multiple canvases rended by one device
-
-			const encoder = device.createCommandEncoder();
-
-			const pass = encoder.beginRenderPass({
-				colorAttachments: [
-					{
-						view: context.getCurrentTexture().createView(),
-						loadOp: "clear",
-						clearValue: [0, 0, 0.2, 1],
-						storeOp: "store",
-					},
-				],
-			});
-			pass.end();
-
-			const commandBuffer = encoder.finish();
-			device.queue.submit([commandBuffer]);
-			// once a commandBuffer is submitted it cant be used again. Create a new one for next time.
-		</script>
+		<script src="./script.mjs" type="module"></script>
 	</body>
 </html>
