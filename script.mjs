@@ -1,6 +1,6 @@
 const canvas = document.querySelector("canvas");
-const GRID_SIZE = 1000;
-const UPDATE_INTERVAL = 4;
+const GRID_SIZE = 100;
+const UPDATE_INTERVAL = 50;
 const WORKGROUP_SIZE = 8;
 let step = 0;
 
